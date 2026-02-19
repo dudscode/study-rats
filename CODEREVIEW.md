@@ -22,7 +22,26 @@ group.getMemberships().add(membership); // Correctly adds to the list
 
 **Impact:** This bug would have caused groups to only have one member at a time, losing all previous members when a new one joined.
 
-### 2. Missing Validation
+### 2. Critical Bug - Null Memberships List
+**Severity:** Critical  
+**Location:** `Group.java` and `User.java`  
+**Issue:** `getMemberships()` returned null when the list wasn't initialized, causing NullPointerException when trying to add memberships.
+
+**Root Cause:** Lombok's `@Builder` combined with JPA doesn't always initialize `@Builder.Default` collections, especially when entities are retrieved from the database.
+
+**Solution:** Added custom getter methods that initialize the list if null:
+```java
+public List<GroupMembership> getMemberships() {
+    if (memberships == null) {
+        memberships = new ArrayList<>();
+    }
+    return memberships;
+}
+```
+
+**Impact:** Now safe to use `group.getMemberships().add()` without NullPointerException.
+
+### 3. Missing Validation
 **Severity:** High  
 **Location:** Entity classes and Controllers  
 **Issue:** No validation on user inputs, which could allow invalid data into the database.
@@ -36,14 +55,14 @@ group.getMemberships().add(membership); // Correctly adds to the list
   - `@Size` for length constraints
   - Added `spring-boot-starter-validation` dependency
 
-### 3. Encoding Issues
+### 4. Encoding Issues
 **Severity:** Medium  
 **Location:** `application.properties`  
 **Issue:** Portuguese characters with incorrect encoding prevented Maven from building the project.
 
 **Fixed:** Replaced Portuguese comments with English equivalents.
 
-### 4. Java Version Mismatch
+### 5. Java Version Mismatch
 **Severity:** High  
 **Location:** `pom.xml`  
 **Issue:** Project configured for Java 21, but runtime only has Java 17.
@@ -176,15 +195,16 @@ This separation of concerns is good practice and should be maintained.
 ## Summary of Changes Made
 
 1. ✅ Fixed critical membership list bug in `GroupService` and `GroupMemberShipService`
-2. ✅ Added validation annotations to `User` and `Group` entities
-3. ✅ Added `@Valid` to controller methods
-4. ✅ Added `spring-boot-starter-validation` dependency
-5. ✅ Fixed encoding issues in `application.properties`
-6. ✅ Changed Java version from 21 to 17
-7. ✅ Added `@JsonBackReference` to `GroupMembership`
-8. ✅ Made API return types consistent (all DTOs)
-9. ✅ Improved `UserService.createUser()` to return DTO
-10. ✅ Verified application builds successfully
+2. ✅ Fixed critical null memberships list bug by adding null-safe getters in `User` and `Group`
+3. ✅ Added validation annotations to `User` and `Group` entities
+4. ✅ Added `@Valid` to controller methods
+5. ✅ Added `spring-boot-starter-validation` dependency
+6. ✅ Fixed encoding issues in `application.properties`
+7. ✅ Changed Java version from 21 to 17
+8. ✅ Added `@JsonBackReference` to `GroupMembership`
+9. ✅ Made API return types consistent (all DTOs)
+10. ✅ Improved `UserService.createUser()` to return DTO
+11. ✅ Verified application builds successfully
 
 ## Next Steps for Development Team
 

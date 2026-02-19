@@ -36,4 +36,12 @@ public class Group  implements Serializable {
     @Builder.Default
     @JsonManagedReference("group-membership")
     private List<GroupMembership> memberships = new ArrayList<>();
+    
+    // Override getter to ensure list is never null
+    public List<GroupMembership> getMemberships() {
+        if (memberships == null) {
+            memberships = new ArrayList<>();
+        }
+        return memberships;
+    }
 }

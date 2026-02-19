@@ -11,22 +11,37 @@ Code review completo da primeira parte do projeto Study Rats (aplicação Spring
 **Solução:** Alterado para `getMemberships().add(membership)`  
 **Impacto:** Sem essa correção, grupos teriam apenas 1 membro por vez
 
-### 2. Falta de Validação
+### 2. Bug Crítico: Lista de Memberships Null
+**Localização:** `Group.java` e `User.java`  
+**Problema:** `getMemberships()` retornava null quando a lista não estava inicializada  
+**Solução:** Adicionado getter customizado que inicializa a lista se for null  
+**Código:**
+```java
+public List<GroupMembership> getMemberships() {
+    if (memberships == null) {
+        memberships = new ArrayList<>();
+    }
+    return memberships;
+}
+```
+**Impacto:** Agora é seguro usar `group.getMemberships().add()` sem NullPointerException
+
+### 3. Falta de Validação
 **Adicionado:**
 - Anotações de validação nas entidades (`@NotBlank`, `@Email`, `@Past`, `@Size`)
 - `@Valid` nos controllers
 - Dependência `spring-boot-starter-validation`
 
-### 3. Problemas de Encoding
+### 4. Problemas de Encoding
 **Corrigido:** Comentários em português no `application.properties` causavam erro no Maven
 
-### 4. Versão do Java
+### 5. Versão do Java
 **Corrigido:** Alterado de Java 21 para Java 17 (compatível com o ambiente)
 
-### 5. Anotações JSON Faltando
+### 6. Anotações JSON Faltando
 **Adicionado:** `@JsonBackReference` no `GroupMembership` para evitar referências circulares
 
-### 6. Respostas de API Inconsistentes
+### 7. Respostas de API Inconsistentes
 **Melhorado:** Todos os endpoints agora retornam DTOs consistentemente
 
 ## ⚠️ Problemas de Segurança Identificados (NÃO CORRIGIDOS)
@@ -73,8 +88,8 @@ A arquitetura está bem estruturada em camadas:
 
 ## 📝 Arquivos Modificados
 
-1. `User.java` - Adicionadas validações
-2. `Group.java` - Adicionadas validações
+1. `User.java` - Adicionadas validações + getter null-safe
+2. `Group.java` - Adicionadas validações + getter null-safe
 3. `GroupMembership.java` - Adicionado @JsonBackReference
 4. `GroupService.java` - Corrigido bug crítico
 5. `GroupMemberShipService.java` - Corrigido bug crítico
@@ -96,7 +111,7 @@ A arquitetura está bem estruturada em camadas:
 
 O código está bem estruturado. Os bugs críticos foram corrigidos e validações foram adicionadas. **PORÉM, o problema de armazenamento de senhas DEVE ser resolvido antes do deploy em produção.**
 
-Total de problemas corrigidos: **6**  
+Total de problemas corrigidos: **7**  
 Total de problemas identificados: **3** (requerem atenção)  
 Status do build: **✅ Sucesso**  
 Vulnerabilidades de segurança detectadas pelo CodeQL: **0**
