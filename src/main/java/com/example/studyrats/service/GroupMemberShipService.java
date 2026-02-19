@@ -48,7 +48,7 @@ public class GroupMemberShipService {
                 .build();
 
         group.getMemberships().add(membership);
-        user.getMemberships().add(membership);
+        // Don't add to user.getMemberships() - cascade from group save will handle it
 
         Group savedGroup = groupRepository.save(group);
 

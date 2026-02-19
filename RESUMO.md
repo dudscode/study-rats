@@ -26,22 +26,35 @@ public List<GroupMembership> getMemberships() {
 ```
 **Impacto:** Agora é seguro usar `group.getMemberships().add()` sem NullPointerException
 
-### 3. Falta de Validação
+### 3. Bug Crítico: Duplicação de Membros
+**Localização:** `GroupService.java` e `GroupMemberShipService.java`  
+**Problema:** Ao adicionar usuário ao grupo, ele era inserido duas vezes no banco de dados  
+**Causa Raiz:** Adicionar membership em ambas as listas (`group.getMemberships()` e `user.getMemberships()`) e depois salvar causava cascade duplo  
+**Solução:** Remover `user.getMemberships().add(membership)` - deixar apenas no grupo  
+**Código:**
+```java
+group.getMemberships().add(membership);
+// Não adicionar a user.getMemberships() - cascade do group cuida disso
+Group savedGroup = groupRepository.save(group);
+```
+**Impacto:** Agora usuários são adicionados corretamente uma única vez
+
+### 4. Falta de Validação
 **Adicionado:**
 - Anotações de validação nas entidades (`@NotBlank`, `@Email`, `@Past`, `@Size`)
 - `@Valid` nos controllers
 - Dependência `spring-boot-starter-validation`
 
-### 4. Problemas de Encoding
+### 5. Problemas de Encoding
 **Corrigido:** Comentários em português no `application.properties` causavam erro no Maven
 
-### 5. Versão do Java
+### 6. Versão do Java
 **Corrigido:** Alterado de Java 21 para Java 17 (compatível com o ambiente)
 
-### 6. Anotações JSON Faltando
+### 7. Anotações JSON Faltando
 **Adicionado:** `@JsonBackReference` no `GroupMembership` para evitar referências circulares
 
-### 7. Respostas de API Inconsistentes
+### 8. Respostas de API Inconsistentes
 **Melhorado:** Todos os endpoints agora retornam DTOs consistentemente
 
 ## ⚠️ Problemas de Segurança Identificados (NÃO CORRIGIDOS)
@@ -91,8 +104,8 @@ A arquitetura está bem estruturada em camadas:
 1. `User.java` - Adicionadas validações + getter null-safe
 2. `Group.java` - Adicionadas validações + getter null-safe
 3. `GroupMembership.java` - Adicionado @JsonBackReference
-4. `GroupService.java` - Corrigido bug crítico
-5. `GroupMemberShipService.java` - Corrigido bug crítico
+4. `GroupService.java` - Corrigido bug crítico de lista + duplicação
+5. `GroupMemberShipService.java` - Corrigido bug crítico de lista + duplicação
 6. `UserController.java` - Adicionado @Valid, retorno DTO
 7. `GroupController.java` - Adicionado @Valid, tipos específicos
 8. `UserService.java` - Retorna DTO
@@ -100,6 +113,8 @@ A arquitetura está bem estruturada em camadas:
 10. `pom.xml` - Java 17, validation dependency
 11. `CODEREVIEW.md` - Documentação completa (novo)
 12. `RESUMO.md` - Este arquivo (novo)
+13. `FIX_NULL_MEMBERSHIPS.md` - Doc técnica sobre null list (novo)
+14. `FIX_DUPLICATE_MEMBERSHIP.md` - Doc técnica sobre duplicação (novo)
 
 ## 🎯 Próximos Passos URGENTES
 
@@ -111,7 +126,7 @@ A arquitetura está bem estruturada em camadas:
 
 O código está bem estruturado. Os bugs críticos foram corrigidos e validações foram adicionadas. **PORÉM, o problema de armazenamento de senhas DEVE ser resolvido antes do deploy em produção.**
 
-Total de problemas corrigidos: **7**  
+Total de problemas corrigidos: **8**  
 Total de problemas identificados: **3** (requerem atenção)  
 Status do build: **✅ Sucesso**  
 Vulnerabilidades de segurança detectadas pelo CodeQL: **0**
