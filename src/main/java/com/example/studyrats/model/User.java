@@ -3,6 +3,9 @@ package com.example.studyrats.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Past;
 import lombok.*;
 
 import java.io.Serializable;
@@ -22,12 +25,26 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String userId;
+    
+    @NotBlank(message = "First name is required")
     private String firstName;
+    
+    @NotBlank(message = "Last name is required")
     private String lastName;
+    
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
+    @Column(unique = true)
     private String email;
+    
+    @NotBlank(message = "Password is required")
     private String passwordHash;
+    
+    @Past(message = "Birth date must be in the past")
     private LocalDate birthDate;
+    
     private LocalDateTime creationDate;
+    
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @JsonManagedReference("user-membership")

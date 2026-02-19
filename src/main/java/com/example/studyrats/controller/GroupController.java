@@ -4,6 +4,7 @@ package com.example.studyrats.controller;
 import com.example.studyrats.dto.GroupResponseDTO;
 import com.example.studyrats.model.Group;
 import com.example.studyrats.service.GroupService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class GroupController {
     private GroupService groupService;
 
     @PostMapping("/create/{idUser}")
-    public ResponseEntity<?> createGroup(@PathVariable String idUser, @RequestBody Group group) {
+    public ResponseEntity<GroupResponseDTO> createGroup(@PathVariable String idUser, @Valid @RequestBody Group group) {
         Optional<GroupResponseDTO> groupOptional = groupService.save(idUser, group);
 
         if (groupOptional.isPresent()) {
@@ -30,7 +31,7 @@ public class GroupController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<?>> getAllGroups() {
+    public ResponseEntity<List<GroupResponseDTO>> getAllGroups() {
         return new ResponseEntity<>(groupService.findAll(), HttpStatus.OK);
     }
 }
