@@ -19,7 +19,7 @@ public class GroupController {
     private GroupService groupService;
 
     @PostMapping("/create/{idUser}")
-    public ResponseEntity<?> createGroup(@PathVariable String idUser, @RequestBody Group group) {
+    public ResponseEntity<GroupResponseDTO> createGroup(@PathVariable String idUser, @RequestBody Group group) {
         Optional<GroupResponseDTO> groupOptional = groupService.save(idUser, group);
 
         if (groupOptional.isPresent()) {
@@ -30,7 +30,16 @@ public class GroupController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<?>> getAllGroups() {
+    public ResponseEntity<List<GroupResponseDTO>> getAllGroups() {
         return new ResponseEntity<>(groupService.findAll(), HttpStatus.OK);
+    }
+
+    @GetMapping("{idGroup}")
+    public ResponseEntity<GroupResponseDTO> getGroup(@PathVariable String idGroup) {
+        Optional<GroupResponseDTO> groupOptional = groupService.findById(idGroup);
+        if (groupOptional.isPresent()) {
+            return new ResponseEntity<>(groupOptional.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

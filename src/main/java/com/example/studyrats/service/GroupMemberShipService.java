@@ -47,8 +47,7 @@ public class GroupMemberShipService {
                 .role(GroupMembership.Role.MEMBER)
                 .build();
 
-        group.setMemberships(List.of(membership));
-        user.getMemberships().add(membership);
+        group.getMemberships().add(membership);
 
         Group savedGroup = groupRepository.save(group);
 
