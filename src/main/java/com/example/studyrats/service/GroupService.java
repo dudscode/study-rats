@@ -55,8 +55,17 @@ public class GroupService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<GroupResponseDTO> findById(String id) {
-        return groupRepository.findById(id)
-                .map(GroupMapper::toDTO);
+    public Optional<GroupResponseDTO> findById(String idUser,  String idGroup) {
+        Optional<Group> groupFilter = groupRepository.findById(idGroup).filter(group ->
+                group.getMemberships()
+                        .stream()
+                        .anyMatch(m -> m.getUser().getUserId().equals(idUser))
+        );
+        if(groupFilter.isPresent()) {
+            return groupRepository.findById(idGroup)
+                    .map(GroupMapper::toDTO);
+        }
+
+        return Optional.empty();
     }
 }

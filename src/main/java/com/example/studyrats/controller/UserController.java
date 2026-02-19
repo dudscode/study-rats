@@ -1,15 +1,24 @@
 package com.example.studyrats.controller;
 
 
+import com.example.studyrats.dto.GroupResponseDTO;
 import com.example.studyrats.dto.UserResponseDTO;
+import com.example.studyrats.model.Group;
 import com.example.studyrats.model.User;
 import com.example.studyrats.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("users")
@@ -18,12 +27,21 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/create")
-   public ResponseEntity<User> create(@RequestBody User user) {
+   public ResponseEntity<CollectionModel<EntityModel<User>>> create(@RequestBody User user) {
+
             if(userService.createUser(user)) {
-                return  ResponseEntity.status(HttpStatus.CREATED).body(user);
+                List<EntityModel<User>> entities = List.of(EntityModel.of(user,
+                        linkTo(methodOn(GroupController.class).createGroup(user.getUserId(),null )).withRel("create_group").withType("POST"),
+                        linkTo(methodOn(GroupMemberShipController.class).joinMember(user.getUserId(),null )).withRel("join_group").withType("POST")
+
+                ));
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .contentType(MediaTypes.HAL_JSON)
+                        .body(CollectionModel.of(entities));
             }
             return  ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
+
 
     @GetMapping("/all")
     public ResponseEntity<List<UserResponseDTO>> getAll() {
