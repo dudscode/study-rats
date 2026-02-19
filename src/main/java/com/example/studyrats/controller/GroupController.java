@@ -46,7 +46,7 @@ public class GroupController {
         return new ResponseEntity<>(groupService.findAll(), HttpStatus.OK);
     }
 
-    @GetMapping("{idUser}/{idGroup}")
+    @GetMapping("/{idUser}/{idGroup}")
     public ResponseEntity<CollectionModel<EntityModel<GroupResponseDTO>>> getById(@PathVariable String idUser, @PathVariable String idGroup) {
         Optional<GroupResponseDTO> groupOptional = groupService.findById(idUser, idGroup);
         if (groupOptional.isPresent()) {
@@ -55,7 +55,7 @@ public class GroupController {
                     linkTo(methodOn(GroupController.class).getById(idUser, idGroup)).withRel("self").withType("GET"),
                     linkTo(methodOn(GroupController.class).createGroup(idUser,null )).withRel("create_group").withType("POST")
                     ));
-            return ResponseEntity.status(HttpStatus.FOUND)
+            return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaTypes.HAL_JSON)
                     .body(CollectionModel.of(entities));
         }
