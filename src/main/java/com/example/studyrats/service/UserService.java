@@ -32,13 +32,13 @@ public class UserService {
                 .map(UserMapper::toDTO);
     }
 
-    public Boolean createUser(User user) {
+    public Optional<UserResponseDTO> createUser(User user) {
         if (userRepository.findByEmail(user.getEmail()) != null) {
-            return false;
+            return Optional.empty();
         }
         user.setCreationDate(LocalDateTime.now());
-        userRepository.save(user);
-        return true;
+        User savedUser = userRepository.save(user);
+        return Optional.of(UserMapper.toDTO(savedUser));
     }
 
     public Optional<User> getEntityById(String id) {

@@ -27,12 +27,14 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/create")
-   public ResponseEntity<CollectionModel<EntityModel<User>>> create(@RequestBody User user) {
+   public ResponseEntity<CollectionModel<EntityModel<UserResponseDTO>>> create(@RequestBody User user) {
 
-            if(userService.createUser(user)) {
-                List<EntityModel<User>> entities = List.of(EntityModel.of(user,
-                        linkTo(methodOn(GroupController.class).createGroup(user.getUserId(),null )).withRel("create_group").withType("POST"),
-                        linkTo(methodOn(GroupMemberShipController.class).joinMember(user.getUserId(),null )).withRel("join_group").withType("POST")
+            Optional<UserResponseDTO> createdUser = userService.createUser(user);
+            if(createdUser.isPresent()) {
+                UserResponseDTO userDTO = createdUser.get();
+                List<EntityModel<UserResponseDTO>> entities = List.of(EntityModel.of(userDTO,
+                        linkTo(methodOn(GroupController.class).createGroup(userDTO.getId(),null )).withRel("create_group").withType("POST"),
+                        linkTo(methodOn(GroupMemberShipController.class).joinMember(userDTO.getId(),null )).withRel("join_group").withType("POST")
 
                 ));
                 return ResponseEntity.status(HttpStatus.CREATED)
