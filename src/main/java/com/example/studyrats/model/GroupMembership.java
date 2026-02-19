@@ -23,10 +23,12 @@ public class GroupMembership implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference("user-membership")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)
+    @JsonBackReference("group-membership")
     private Group group;
 
     private LocalDateTime joinedAt;
