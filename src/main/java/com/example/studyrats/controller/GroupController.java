@@ -31,17 +31,18 @@ public class GroupController {
     private CheckinService checkinService;
 
     @PostMapping("/create/{idUser}")
-    public ResponseEntity<CollectionModel<EntityModel<GroupResponseDTO>>> createGroup(@PathVariable String idUser, @RequestBody Group group) {
+    public ResponseEntity<EntityModel<GroupResponseDTO>> createGroup(@PathVariable String idUser, @RequestBody Group group) {
         Optional<GroupResponseDTO> groupOptional = groupService.save(idUser, group);
 
         if (groupOptional.isPresent()) {
             GroupResponseDTO groupResponseDTO = groupOptional.get();
-            List<EntityModel<GroupResponseDTO>> entities = List.of(EntityModel.of(groupResponseDTO,
-                    linkTo(methodOn(GroupController.class).getById(idUser,group.getId())).withRel("grupo").withType("GET")
-            ));
             return ResponseEntity.status(HttpStatus.CREATED)
                     .contentType(MediaTypes.HAL_JSON)
-                    .body(CollectionModel.of(entities));
+                    .body(EntityModel.of(groupResponseDTO,
+                            linkTo(methodOn(GroupController.class).getById(idUser,group.getId())).withRel("grupo").withType("GET"),
+                            linkTo(methodOn(GroupController.class).getRanking(group.getId())).withRel("ranking").withType("GET"),
+                            linkTo(methodOn(GroupController.class).createGroup(idUser, group)).withRel("self").withType("POST")
+                    ));
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -67,14 +68,13 @@ public class GroupController {
         Optional<GroupResponseDTO> groupOptional = groupService.findById(idUser, idGroup);
         if (groupOptional.isPresent()) {
             GroupResponseDTO groupResponseDTO = groupOptional.get();
-            EntityModel<GroupResponseDTO> groupEntity = EntityModel.of(groupResponseDTO,
-                    linkTo(methodOn(GroupController.class).getById(idUser, idGroup)).withRel("self").withType("GET"),
-                    linkTo(methodOn(GroupController.class).getRanking(idGroup)).withRel("ranking").withType("GET")
-            );
 
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaTypes.HAL_JSON)
-                    .body(groupEntity);
+                    .body(EntityModel.of(groupResponseDTO,
+                            linkTo(methodOn(GroupController.class).getById(idUser, idGroup)).withRel("self").withType("GET"),
+                            linkTo(methodOn(GroupController.class).getRanking(idGroup)).withRel("ranking").withType("GET")
+                    ));
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -82,14 +82,6 @@ public class GroupController {
     public ResponseEntity<?> getRanking(
             @PathVariable String idGroup) {
         List<RankingDTO> ranking = checkinService.getRanking(idGroup);
-        if (ranking.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .contentType(MediaTypes.HAL_JSON)
-                    .body(List.of(
-                            linkTo(methodOn(GroupController.class).getRanking(idGroup)).withRel("self").withType("GET")
-                            )
-                    );
-        }
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .contentType(MediaTypes.HAL_JSON)

@@ -29,24 +29,23 @@ public class GroupMemberShipController {
     private GroupMemberShipService groupMemberShipService;
 
     @PostMapping("/join/{idUser}/{idGroup}")
-    public ResponseEntity<CollectionModel<EntityModel<Optional<GroupResponseDTO>>>> joinMember(@PathVariable String idUser, @PathVariable String idGroup) {
+    public ResponseEntity<EntityModel<Optional<GroupResponseDTO>>> joinMember(@PathVariable String idUser, @PathVariable String idGroup) {
         Optional<GroupResponseDTO> group = groupMemberShipService.addUserToGroup(idUser, idGroup);
         if (group.isEmpty()) {
-            List<EntityModel<Optional<GroupResponseDTO>>> entities = List.of(EntityModel.of(group,
-                    linkTo(methodOn(GroupMemberShipController.class).joinMember(idUser,idGroup )).withRel("self").withType("POST")
-
-            ));
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .contentType(MediaTypes.HAL_JSON)
-                    .body(CollectionModel.of(entities));
+                    .body(EntityModel.of(group,
+                            linkTo(methodOn(GroupMemberShipController.class).joinMember(idUser,idGroup )).withRel("self").withType("POST")));
         }
-        List<EntityModel<Optional<GroupResponseDTO>>> entities = List.of(EntityModel.of(group,
-                linkTo(methodOn(GroupController.class).createGroup(idUser,null )).withRel("create_group").withType("POST"),
-                linkTo(methodOn(GroupMemberShipController.class).joinMember(idUser,idGroup )).withRel("self").withType("POST")
 
-        ));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .contentType(MediaTypes.HAL_JSON)
-                .body(CollectionModel.of(entities));
+                .body(EntityModel.of(group,
+                        linkTo(methodOn(GroupController.class).createGroup(idUser,null )).withRel("create_group").withType("POST"),
+                        linkTo(methodOn(GroupMemberShipController.class).joinMember(idUser,idGroup )).withRel("self").withType("POST"),
+                        linkTo(methodOn(GroupController.class).getById(idUser,idGroup)).withRel("group").withType("GET"),
+                        linkTo(methodOn(GroupController.class).getRanking(idGroup)).withRel("ranking").withType("GET")
+
+                ));
     }
 }
