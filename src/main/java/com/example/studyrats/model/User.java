@@ -43,6 +43,10 @@ public class User implements Serializable {
     @JsonManagedReference("user-membership")
     private List<GroupMembership> memberships = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Checkin> checkins = new ArrayList<>();
+
     public List<GroupMembership> getMemberships() {
         if (memberships == null) {
             memberships = new ArrayList<>();

@@ -68,4 +68,8 @@ public class GroupService {
 
         return Optional.empty();
     }
+
+    public Optional<Group> getEntityById(String id) {
+        return groupRepository.findById(id);
+    }
 }
