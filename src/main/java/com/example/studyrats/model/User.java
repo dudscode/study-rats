@@ -45,6 +45,7 @@ public class User implements Serializable {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonBackReference("user-checkin")
     private List<Checkin> checkins = new ArrayList<>();
 
     public List<GroupMembership> getMemberships() {
