@@ -33,6 +33,10 @@ public class Group  implements Serializable {
     @JsonManagedReference("group-membership")
     private List<GroupMembership> memberships = new ArrayList<>();
 
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Checkin> checkins = new ArrayList<>();
+
     public List<GroupMembership> getMemberships() {
         if (memberships == null) {
             memberships = new ArrayList<>();

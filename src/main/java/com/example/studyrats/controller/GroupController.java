@@ -2,7 +2,9 @@ package com.example.studyrats.controller;
 
 
 import com.example.studyrats.dto.GroupResponseDTO;
+import com.example.studyrats.dto.RankingDTO;
 import com.example.studyrats.model.Group;
+import com.example.studyrats.service.CheckinService;
 import com.example.studyrats.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -23,6 +26,9 @@ import org.springframework.hateoas.MediaTypes;
 public class GroupController {
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    private CheckinService checkinService;
 
     @PostMapping("/create/{idUser}")
     public ResponseEntity<CollectionModel<EntityModel<GroupResponseDTO>>> createGroup(@PathVariable String idUser, @RequestBody Group group) {
@@ -42,23 +48,56 @@ public class GroupController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<GroupResponseDTO>> getAllGroups() {
-        return new ResponseEntity<>(groupService.findAll(), HttpStatus.OK);
+    public ResponseEntity
+            <CollectionModel<EntityModel<GroupResponseDTO>>> getAllGroups() {
+        List<GroupResponseDTO> groups = groupService.findAll();
+        List<EntityModel<GroupResponseDTO>> entities = groups.stream().map(g -> EntityModel.of(g,
+                linkTo(methodOn(GroupController.class).getRanking(g.getId())).withRel("ranking").withType("GET")
+        )).collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaTypes.HAL_JSON)
+                .body(CollectionModel.of(entities,
+                        linkTo(methodOn(GroupController.class).getAllGroups()).withRel("self").withType("GET")
+                ));
+
     }
 
     @GetMapping("/{idUser}/{idGroup}")
-    public ResponseEntity<CollectionModel<EntityModel<GroupResponseDTO>>> getById(@PathVariable String idUser, @PathVariable String idGroup) {
+    public ResponseEntity<EntityModel<GroupResponseDTO>> getById(@PathVariable String idUser, @PathVariable String idGroup) {
         Optional<GroupResponseDTO> groupOptional = groupService.findById(idUser, idGroup);
         if (groupOptional.isPresent()) {
             GroupResponseDTO groupResponseDTO = groupOptional.get();
-            List<EntityModel<GroupResponseDTO>> entities = List.of(EntityModel.of(groupResponseDTO,
+            EntityModel<GroupResponseDTO> groupEntity = EntityModel.of(groupResponseDTO,
                     linkTo(methodOn(GroupController.class).getById(idUser, idGroup)).withRel("self").withType("GET"),
-                    linkTo(methodOn(GroupController.class).createGroup(idUser,null )).withRel("create_group").withType("POST")
-                    ));
+                    linkTo(methodOn(GroupController.class).getRanking(idGroup)).withRel("ranking").withType("GET")
+            );
+
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaTypes.HAL_JSON)
-                    .body(CollectionModel.of(entities));
+                    .body(groupEntity);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    @GetMapping("/ranking/{idGroup}")
+    public ResponseEntity<?> getRanking(
+            @PathVariable String idGroup) {
+        List<RankingDTO> ranking = checkinService.getRanking(idGroup);
+        if (ranking.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaTypes.HAL_JSON)
+                    .body(List.of(
+                            linkTo(methodOn(GroupController.class).getRanking(idGroup)).withRel("self").withType("GET")
+                            )
+                    );
+        }
+
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .contentType(MediaTypes.HAL_JSON)
+                .body(CollectionModel.of(ranking,
+                        List.of(
+                                linkTo(methodOn(GroupController.class).getRanking(idGroup)).withRel("self").withType("GET")
+                        )
+                ));
+
     }
 }
