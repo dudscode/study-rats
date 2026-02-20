@@ -83,7 +83,7 @@ public class GroupController {
             @PathVariable String idGroup) {
         List<RankingDTO> ranking = checkinService.getRanking(idGroup);
 
-        return ResponseEntity.status(HttpStatus.FOUND)
+        return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaTypes.HAL_JSON)
                 .body(CollectionModel.of(ranking,
                         List.of(

@@ -21,7 +21,7 @@ public class CheckinController {
     private CheckinService checkinService;
 
     @PostMapping("/{idUser}/{idGroup}")
-    public ResponseEntity<List<Link>>createCheckin(@PathVariable String idUser, @PathVariable String idGroup) {
+    public ResponseEntity<List<Link>> createCheckin(@PathVariable String idUser, @PathVariable String idGroup) {
 
        if (checkinService.createCheckin(idUser, idGroup)) {
            return ResponseEntity.status(HttpStatus.CREATED)
@@ -32,6 +32,6 @@ public class CheckinController {
                            linkTo(methodOn(GroupController.class).getRanking(idGroup)).withRel("ranking").withType("GET")
                    ));
        }
-       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }
