@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-chimport java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +49,6 @@ public class CheckinService {
         LocalDateTime checkinTime = LocalDateTime.now();
 
         for (Group group : userGroups) {
-            // Verificar se já fez checkin neste grupo hoje
             if (!hasCheckedInTodayForGroup(user, group)) {
                 Checkin checkin = Checkin.builder()
                         .user(user)
@@ -68,16 +67,7 @@ public class CheckinService {
         return createdCheckins;
     }
 
-    public boolean hasCheckedInToday(Optional<User> optionalUser) {
-        if (optionalUser.isEmpty() ) {
-            return false;
-        }
-        return checkinRepository.existsByUserAndCheckinDateBetween(
-                optionalUser.get(),
-                LocalDateTime.now().toLocalDate().atStartOfDay(),
-                LocalDateTime.now().toLocalDate().atTime(23, 59, 59)
-        );
-    }
+
 
     public boolean hasCheckedInTodayForGroup(User user, Group group) {
         return checkinRepository.existsByUserAndGroupAndCheckinDateBetween(
