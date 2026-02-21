@@ -1,5 +1,6 @@
 package com.example.studyrats.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -35,6 +36,7 @@ public class Group  implements Serializable {
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonBackReference("group-checkin")
     private List<Checkin> checkins = new ArrayList<>();
 
     public List<GroupMembership> getMemberships() {

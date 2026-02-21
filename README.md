@@ -12,6 +12,35 @@
   </p>
 </div>
 
+## Como rodar com Docker
+
+### Pré-requisitos
+- Docker e Docker Compose instalados
+
+### Executando a aplicação
+```bash
+# Clone o repositório (se necessário)
+# cd studyrats
+
+# Execute com docker-compose (irá criar e configurar o MySQL automaticamente)
+docker-compose up --build
+
+# Ou execute em background
+docker-compose up -d --build
+```
+
+A aplicação estará disponível em `http://localhost:9090`
+
+### Parar a aplicação
+```bash
+docker-compose down
+```
+
+### Parar e remover volumes (limpar dados do banco)
+```bash
+docker-compose down -v
+```
+
 <h3 align="center">Recursos que quero usar</h3>
 
 - [ ] S3 
@@ -26,8 +55,8 @@
 - [x] Criar endpoints basicos Login, cadastro,checkin grupo, ranking - Sem validações 
 - [x] Incluir Hateoas + Hal
 - [x] Conectar local MySQL
-- [ ] Checkin -> Apenas um por dia, Titulo, descrição do que aprendeu, tempo de estudo
+- [x] Checkin -> Apenas um por dia, Titulo, descrição do que aprendeu, tempo de estudo
 - [ ] Incluir Imagem no checkin
 - [ ] Incluir OAUTH + JWT + Validação de endpoint
-- [ ] Rodar no Docker
+- [x] Rodar no Docker
 

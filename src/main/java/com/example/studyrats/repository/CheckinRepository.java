@@ -25,7 +25,9 @@ public interface CheckinRepository extends JpaRepository<Checkin, String> {
 """)
     List<RankingDTO> getRankingByGroup(String groupId);
 
-   // cria query existsByUserAndGroupAndCheckinDateBetween
+
+    boolean existsByUserAndCheckinDateBetween(User user, java.time.LocalDateTime startOfDay, java.time.LocalDateTime endOfDay);
+
     boolean existsByUserAndGroupAndCheckinDateBetween(User user, Group group, java.time.LocalDateTime startOfDay, java.time.LocalDateTime endOfDay);
 
 

@@ -69,7 +69,11 @@ public class GroupService {
         return Optional.empty();
     }
 
-    public Optional<Group> getEntityById(String id) {
-        return groupRepository.findById(id);
+    public List<Group> getAllGroupByUser(String idUser) {
+        return groupRepository.findAllByUserId(idUser);
+    }
+
+    public List<Group> allEntity() {
+        return groupRepository.findAll();
     }
 }

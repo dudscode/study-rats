@@ -3,6 +3,7 @@ package com.example.studyrats.controller;
 
 import com.example.studyrats.dto.GroupResponseDTO;
 import com.example.studyrats.dto.RankingDTO;
+import com.example.studyrats.mapper.GroupMapper;
 import com.example.studyrats.model.Group;
 import com.example.studyrats.service.CheckinService;
 import com.example.studyrats.service.GroupService;
@@ -78,6 +79,20 @@ public class GroupController {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+    @GetMapping("/user/{idUser}")
+    public ResponseEntity<?> getAllGroupByUser(@PathVariable String idUser) {
+        List<Group> groups = groupService.getAllGroupByUser(idUser);
+        List<EntityModel<GroupResponseDTO>> entities = groups.stream().map(g -> EntityModel.of(GroupMapper.toDTO(g),
+                linkTo(methodOn(GroupController.class).getRanking(g.getId())).withRel("ranking").withType("GET")
+        )).collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaTypes.HAL_JSON)
+                .body(CollectionModel.of(entities,
+                        linkTo(methodOn(GroupController.class).getAllGroupByUser(idUser)).withRel("self").withType("GET")
+                ));
+    }
+
     @GetMapping("/ranking/{idGroup}")
     public ResponseEntity<?> getRanking(
             @PathVariable String idGroup) {

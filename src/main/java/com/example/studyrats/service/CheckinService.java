@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,41 +27,52 @@ public class CheckinService {
     private GroupService groupService;
 
 
-    public boolean createCheckin(String userId, String groupId) {
+    public List<Checkin> createCheckin(String userId, Checkin checkinTemplate) {
 
         Optional<User> optionalUser = userService.getEntityById(userId);
-        Optional<Group> optionalGroup = groupService.getEntityById(groupId);
-        if (optionalUser.isEmpty() || optionalGroup.isEmpty()) {
-            return false;
-        }
-        boolean isMember = optionalGroup.stream()
-                .anyMatch(m -> m.getMemberships().stream()
-                        .anyMatch(member -> member.getUser().getUserId().equals(userId)));
-        if (!isMember) {
-            return false;
+        if (optionalUser.isEmpty()) {
+            return new ArrayList<>();
         }
 
-        if(hasCheckedInToday(optionalUser, optionalGroup)) {
-            return false;
+        User user = optionalUser.get();
+
+        List<Group> userGroups = groupService.allEntity().stream()
+                .filter(group -> group.getMemberships().stream()
+                        .anyMatch(membership -> membership.getUser().getUserId().equals(userId)))
+                .toList();
+
+        if (userGroups.isEmpty()) {
+            return new ArrayList<>();
         }
 
-        Checkin checkin = Checkin.builder()
-                .user(optionalUser.get())
-                .group(optionalGroup.get())
-                .checkinDate(LocalDateTime.now())
-                .build();
+        List<Checkin> createdCheckins = new ArrayList<>();
+        LocalDateTime checkinTime = LocalDateTime.now();
 
-        checkinRepository.save(checkin);
+        for (Group group : userGroups) {
+            if (!hasCheckedInTodayForGroup(user, group)) {
+                Checkin checkin = Checkin.builder()
+                        .user(user)
+                        .group(group)
+                        .title(checkinTemplate.getTitle())
+                        .description(checkinTemplate.getDescription())
+                        .durationMinutes(checkinTemplate.getDurationMinutes())
+                        .checkinDate(checkinTime)
+                        .build();
 
-        return true;
+                Checkin savedCheckin = checkinRepository.save(checkin);
+                createdCheckins.add(savedCheckin);
+            }
+        }
+
+        return createdCheckins;
     }
-    public boolean hasCheckedInToday(Optional<User> optionalUser , Optional<Group> optionalGroup) {
-        if (optionalUser.isEmpty() || optionalGroup.isEmpty()) {
-            return false;
-        }
+
+
+
+    public boolean hasCheckedInTodayForGroup(User user, Group group) {
         return checkinRepository.existsByUserAndGroupAndCheckinDateBetween(
-                optionalUser.get(),
-                optionalGroup.get(),
+                user,
+                group,
                 LocalDateTime.now().toLocalDate().atStartOfDay(),
                 LocalDateTime.now().toLocalDate().atTime(23, 59, 59)
         );
