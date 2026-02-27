@@ -23,8 +23,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 @RequestMapping("users")
 public class UserController {
-    @Autowired
-    private UserService userService;
+
+    private final  UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
 
     @PostMapping("/create")
    public ResponseEntity<EntityModel<RegisterUserResponse>> create(@RequestBody User user) {

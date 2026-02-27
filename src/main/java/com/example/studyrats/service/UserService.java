@@ -22,17 +22,24 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    @Autowired
-    private  UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final  UserRepository userRepository;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private TokenConfig tokenConfig;
+    private final PasswordEncoder passwordEncoder;
+
+
+    private final AuthenticationManager authenticationManager;
+
+
+    private final TokenConfig tokenConfig;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, TokenConfig tokenConfig) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.tokenConfig = tokenConfig;
+    }
 
     public List<UserResponseDTO> getAllUsers() {
         return userRepository.findAll()
