@@ -16,11 +16,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
-    @Autowired
-    private GroupRepository groupRepository;
 
-    @Autowired
-    private UserService userService;
+    private final  GroupRepository groupRepository;
+
+
+    private final  UserService userService;
+
+    public GroupService(GroupRepository groupRepository, UserService userService) {
+        this.groupRepository = groupRepository;
+        this.userService = userService;
+    }
 
     public Optional<GroupResponseDTO> save(String userId, Group group) {
 
