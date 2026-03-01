@@ -15,10 +15,15 @@ import java.util.List;
 import java.util.Optional;
 @Service
 public class GroupMemberShipService {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private GroupRepository groupRepository;
+
+    private final UserService userService;
+
+    private final GroupRepository groupRepository;
+
+    public GroupMemberShipService(UserService userService, GroupRepository groupRepository) {
+        this.userService = userService;
+        this.groupRepository = groupRepository;
+    }
 
     public Optional<GroupResponseDTO> addUserToGroup(String userId, String groupId) {
 

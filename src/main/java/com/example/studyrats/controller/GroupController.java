@@ -25,11 +25,17 @@ import org.springframework.hateoas.MediaTypes;
 @RestController
 @RequestMapping("groups")
 public class GroupController {
-    @Autowired
-    private GroupService groupService;
 
-    @Autowired
-    private CheckinService checkinService;
+    private final GroupService groupService;
+
+
+    private final  CheckinService checkinService;
+
+    public GroupController(GroupService groupService, CheckinService checkinService) {
+        this.groupService = groupService;
+        this.checkinService = checkinService;
+    }
+
 
     @PostMapping("/create/{idUser}")
     public ResponseEntity<EntityModel<GroupResponseDTO>> createGroup(@PathVariable String idUser, @RequestBody Group group) {

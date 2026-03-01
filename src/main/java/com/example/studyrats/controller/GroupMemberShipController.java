@@ -25,8 +25,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("groupmember")
 public class GroupMemberShipController {
 
-    @Autowired
-    private GroupMemberShipService groupMemberShipService;
+    private final GroupMemberShipService groupMemberShipService;
+
+    public GroupMemberShipController(GroupMemberShipService groupMemberShipService) {
+        this.groupMemberShipService = groupMemberShipService;
+    }
+
 
     @PostMapping("/join/{idUser}/{idGroup}")
     public ResponseEntity<EntityModel<Optional<GroupResponseDTO>>> joinMember(@PathVariable String idUser, @PathVariable String idGroup) {

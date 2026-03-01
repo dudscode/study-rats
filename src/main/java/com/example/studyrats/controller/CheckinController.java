@@ -20,8 +20,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("checkin")
 public class CheckinController {
 
-    @Autowired
-    private CheckinService checkinService;
+
+    private final CheckinService checkinService;
+
+    public CheckinController(CheckinService checkinService) {
+        this.checkinService = checkinService;
+    }
 
     @PostMapping("/{idUser}")
     public ResponseEntity<CollectionModel<EntityModel<Checkin>>> createCheckin(@PathVariable String idUser, @RequestBody Checkin checkin) {

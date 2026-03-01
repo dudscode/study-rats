@@ -17,14 +17,20 @@ import java.util.Optional;
 @Service
 public class CheckinService {
 
-    @Autowired
-    private CheckinRepository checkinRepository;
 
-    @Autowired
-    private UserService userService;
+    private final CheckinRepository checkinRepository;
 
-    @Autowired
-    private GroupService groupService;
+
+    private final UserService userService;
+
+
+    private final GroupService groupService;
+
+    public CheckinService(CheckinRepository checkinRepository, UserService userService, GroupService groupService) {
+        this.checkinRepository = checkinRepository;
+        this.userService = userService;
+        this.groupService = groupService;
+    }
 
 
     public List<Checkin> createCheckin(String userId, Checkin checkinTemplate) {
