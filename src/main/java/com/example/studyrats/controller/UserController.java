@@ -1,10 +1,7 @@
 package com.example.studyrats.controller;
 
 
-import com.example.studyrats.dto.LoginUserRequest;
-import com.example.studyrats.dto.LoginUserResponse;
-import com.example.studyrats.dto.RegisterUserResponse;
-import com.example.studyrats.dto.UserResponseDTO;
+import com.example.studyrats.dto.*;
 import com.example.studyrats.model.User;
 import com.example.studyrats.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +29,7 @@ public class UserController {
 
 
     @PostMapping("/create")
-   public ResponseEntity<EntityModel<RegisterUserResponse>> create(@RequestBody User user) {
+   public ResponseEntity<EntityModel<RegisterUserResponse>> create(@RequestBody UserRequest  user) {
 
             Optional<RegisterUserResponse> createdUser = userService.createUser(user);
             if(createdUser.isPresent()) {
@@ -42,7 +39,7 @@ public class UserController {
                         .body(EntityModel.of(userDTO,
                                 linkTo(methodOn(GroupController.class).createGroup(userDTO.idUser(),null )).withRel("create_group").withType("POST"),
                                 linkTo(methodOn(GroupMemberShipController.class).joinMember(userDTO.idUser(),null )).withRel("join_group").withType("POST"),
-                                linkTo(methodOn(CheckinController.class).createCheckin(user.getUserId(), null)).withRel("checkin").withType("POST")
+                                linkTo(methodOn(CheckinController.class).createCheckin(userDTO.idUser(), null)).withRel("checkin").withType("POST")
 
                         ));
             }

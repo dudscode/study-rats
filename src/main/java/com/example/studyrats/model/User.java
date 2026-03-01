@@ -47,10 +47,19 @@ public class User implements UserDetails, Serializable {
     @JsonManagedReference("user-membership")
     private List<GroupMembership> memberships = new ArrayList<>();
 
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @JsonBackReference("user-checkin")
     private List<Checkin> checkins = new ArrayList<>();
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private List<Role> roles;
 
     public List<GroupMembership> getMemberships() {
         if (memberships == null) {

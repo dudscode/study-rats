@@ -1,12 +1,11 @@
 package com.example.studyrats.service;
 
 import com.example.studyrats.config.TokenConfig;
-import com.example.studyrats.dto.LoginUserRequest;
-import com.example.studyrats.dto.LoginUserResponse;
-import com.example.studyrats.dto.RegisterUserResponse;
-import com.example.studyrats.dto.UserResponseDTO;
+import com.example.studyrats.dto.*;
 import com.example.studyrats.mapper.UserMapper;
+import com.example.studyrats.model.Role;
 import com.example.studyrats.model.User;
+import com.example.studyrats.repository.RoleRepository;
 import com.example.studyrats.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final  UserRepository userRepository;
-
 
     private final PasswordEncoder passwordEncoder;
 
@@ -53,15 +51,21 @@ public class UserService {
                 .map(UserMapper::toDTO);
     }
 
-    public Optional<RegisterUserResponse> createUser(User user) {
-        if (userRepository.findByEmail(user.getEmail()) != null) {
+    public Optional<RegisterUserResponse> createUser(UserRequest user) {
+        if (userRepository.findByEmail(user.email()) != null) {
             return Optional.empty();
         }
-        user.setCreationDate(LocalDateTime.now());
-        String passwordHash = passwordEncoder.encode(user.getPasswordHash());
-        user.setPasswordHash(passwordHash);
-        User savedUser = userRepository.save(user);
-        RegisterUserResponse userResponse = new RegisterUserResponse(savedUser.getFirstName(), savedUser.getEmail(), user.getUserId());
+        User newUser = User.builder().
+                firstName(user.firstName()).
+                lastName(user.lastName()).
+                email(user.email()).
+                passwordHash(passwordEncoder.encode(user.password())).
+                birthDate(user.birthday())
+                .creationDate(LocalDateTime.now())
+                .roles(List.of(Role.builder().name(user.role()).build()))
+        .build();
+        User savedUser = userRepository.save(newUser);
+        RegisterUserResponse userResponse = new RegisterUserResponse(savedUser.getFirstName(), savedUser.getEmail(), newUser.getUserId());
         return Optional.of(userResponse);
     }
 
