@@ -46,7 +46,7 @@ docker-compose down -v
 - [ ] S3 
 - [ ] Lambda
 - [ ] Api Gateway
-- [ ] OAUTH
+- [x] OAUTH
 - [ ] RDS PostgreSQL
 
 <h3 align="center">Passos a seguir</h3>
@@ -57,6 +57,6 @@ docker-compose down -v
 - [x] Conectar local MySQL
 - [x] Checkin -> Apenas um por dia, Titulo, descrição do que aprendeu, tempo de estudo
 - [ ] Incluir Imagem no checkin
-- [ ] Incluir OAUTH + JWT + Validação de endpoint
+- [x] Incluir OAUTH + JWT + Validação de endpoint
 - [x] Rodar no Docker
 
