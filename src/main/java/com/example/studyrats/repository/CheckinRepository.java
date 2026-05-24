@@ -28,6 +28,8 @@ public interface CheckinRepository extends JpaRepository<Checkin, String> {
 
     boolean existsByUserAndCheckinDateBetween(User user, java.time.LocalDateTime startOfDay, java.time.LocalDateTime endOfDay);
 
+    List<Checkin> findByUserUserIdOrderByCheckinDateDesc(String userId);
+
     boolean existsByUserAndGroupAndCheckinDateBetween(User user, Group group, java.time.LocalDateTime startOfDay, java.time.LocalDateTime endOfDay);
 
 

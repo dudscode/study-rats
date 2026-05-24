@@ -6,9 +6,10 @@ import com.example.studyrats.model.Checkin;
 import com.example.studyrats.model.Group;
 import com.example.studyrats.model.User;
 import com.example.studyrats.repository.CheckinRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class CheckinService {
     }
 
 
-    public List<Checkin> createCheckin(String userId, Checkin checkinTemplate) {
+    public List<Checkin> createCheckin(String userId, Checkin checkinTemplate, MultipartFile image) throws IOException {
 
         Optional<User> optionalUser = userService.getEntityById(userId);
         if (optionalUser.isEmpty()) {
@@ -51,6 +52,9 @@ public class CheckinService {
             return new ArrayList<>();
         }
 
+        byte[] imageBytes = (image != null && !image.isEmpty()) ? image.getBytes() : null;
+        String imageContentType = (image != null && !image.isEmpty()) ? image.getContentType() : null;
+
         List<Checkin> createdCheckins = new ArrayList<>();
         LocalDateTime checkinTime = LocalDateTime.now();
 
@@ -62,6 +66,8 @@ public class CheckinService {
                         .title(checkinTemplate.getTitle())
                         .description(checkinTemplate.getDescription())
                         .durationMinutes(checkinTemplate.getDurationMinutes())
+                        .imageData(imageBytes)
+                        .imageContentType(imageContentType)
                         .checkinDate(checkinTime)
                         .build();
 
@@ -86,6 +92,10 @@ public class CheckinService {
 
     public List<RankingDTO> getRanking( String groupId) {
         return checkinRepository.getRankingByGroup(groupId);
+    }
+
+    public List<Checkin> getCheckinsByUser(String userId) {
+        return checkinRepository.findByUserUserIdOrderByCheckinDateDesc(userId);
     }
 
 }

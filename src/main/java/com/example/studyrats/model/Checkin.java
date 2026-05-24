@@ -39,5 +39,11 @@ public class Checkin implements Serializable {
 
     private int durationMinutes;
 
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] imageData;
+
+    private String imageContentType;
+
     private LocalDateTime checkinDate;
 }

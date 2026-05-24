@@ -39,7 +39,7 @@ public class UserController {
                         .body(EntityModel.of(userDTO,
                                 linkTo(methodOn(GroupController.class).createGroup(userDTO.idUser(),null )).withRel("create_group").withType("POST"),
                                 linkTo(methodOn(GroupMemberShipController.class).joinMember(userDTO.idUser(),null )).withRel("join_group").withType("POST"),
-                                linkTo(methodOn(CheckinController.class).createCheckin(userDTO.idUser(), null)).withRel("checkin").withType("POST")
+                                linkTo(methodOn(CheckinController.class).createCheckin(userDTO.idUser(), null, null, 0, null)).withRel("checkin").withType("POST")
 
                         ));
             }
@@ -55,7 +55,7 @@ public class UserController {
                     .body(EntityModel.of(loginResponse,
                             linkTo(methodOn(GroupController.class).createGroup(loginResponse.get().idUser(),null )).withRel("create_group").withType("POST"),
                             linkTo(methodOn(GroupMemberShipController.class).joinMember(loginResponse.get().idUser(),null )).withRel("join_group").withType("POST"),
-                            linkTo(methodOn(CheckinController.class).createCheckin(loginResponse.get().idUser(), null)).withRel("checkin").withType("POST")
+                            linkTo(methodOn(CheckinController.class).createCheckin(loginResponse.get().idUser(), null, null, 0, null)).withRel("checkin").withType("POST")
 
                     ));
         } else {
